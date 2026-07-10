@@ -10,6 +10,7 @@
             --bg-color: #0a0a0c;
             --primary: #ff4d6d;
             --text-main: #ffffff;
+            --text-muted: #888891;
             --accent: #ff8fa3;
         }
 
@@ -26,7 +27,7 @@
             overflow: hidden;
         }
 
-        /* Same Floating Particles Logic */
+        /* Floating Particles */
         .floating-particle {
             position: fixed;
             bottom: -10vh;
@@ -48,39 +49,63 @@
             text-align: center;
         }
 
+        .message {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .username {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px var(--primary), 0 0 20px rgba(255, 77, 109, 0.5);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 10px var(--primary); }
+            50% { transform: scale(1.05); text-shadow: 0 0 20px var(--primary), 0 0 30px var(--accent); }
+        }
+
         .timer {
             display: flex;
-            gap: 20px;
+            gap: 40px;
             justify-content: center;
         }
 
         .time-box {
-            background: #141419;
+            background: transparent;
             padding: 20px;
-            border-radius: 15px;
             width: 100px;
-            border: 1px solid #23232b;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .time-box span {
             display: block;
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: 900;
             color: var(--primary);
+            text-shadow: 0 0 20px rgba(255, 77, 109, 0.8), 0 0 40px rgba(255, 77, 109, 0.4);
         }
 
         .label {
             font-size: 0.7rem;
             text-transform: uppercase;
             color: #888;
-            margin-top: 5px;
+            margin-top: 10px;
+            letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
     <div class="countdown-wrapper">
+        <div class="message">The countdown to your big day!</div>
+        <div class="username">pwetty_kkue</div>
         <div class="timer">
             <div class="time-box">
                 <span id="hours">00</span>
@@ -98,7 +123,7 @@
     </div>
 
     <script>
-        // Floating particles
+        // Increased heart frequency
         function createParticle() {
             const p = document.createElement('div');
             p.classList.add('floating-particle');
@@ -116,9 +141,8 @@
             document.body.appendChild(p);
             setTimeout(() => p.remove(), 10000);
         }
-        setInterval(createParticle, 400);
+        setInterval(createParticle, 150); // Increased frequency
 
-        // Countdown Logic (Target: Midnight)
         function updateTimer() {
             const now = new Date();
             const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
