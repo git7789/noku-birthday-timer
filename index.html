@@ -3,37 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counting Down...</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>A Surprise for Noku</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0a0a0c;
+            --surface: #141419;
+            --surface-light: #23232b;
             --primary: #ff4d6d;
             --text-main: #ffffff;
             --text-muted: #888891;
             --accent: #ff8fa3;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            height: 100vh;
+            overflow-x: hidden;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        /* Floating Particles */
+        /* --- FLOATING HEARTS & PARTICLES BACKGROUND --- */
         .floating-particle {
             position: fixed;
             bottom: -10vh;
-            z-index: 1;
-            pointer-events: none;
+            z-index: 5; 
+            pointer-events: none; 
             animation: floatUp linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         @keyframes floatUp {
@@ -43,10 +50,30 @@
             100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
         }
 
-        /* Countdown Container */
-        .countdown-wrapper {
+        /* Mobile-first app container */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            position: relative;
+            background: transparent;
             z-index: 10;
-            text-align: center;
+        }
+
+        /* --- COUNTDOWN SCREEN --- */
+        #countdown-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
         }
 
         .message {
@@ -56,6 +83,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             opacity: 0.8;
+            text-align: center;
         }
 
         .username {
@@ -65,6 +93,7 @@
             margin-bottom: 40px;
             text-shadow: 0 0 10px var(--primary), 0 0 20px rgba(255, 77, 109, 0.5);
             animation: heartbeat 1.5s ease-in-out infinite;
+            text-align: center;
         }
 
         @keyframes heartbeat {
@@ -83,6 +112,7 @@
             background: transparent;
             padding: 20px;
             width: 100px;
+            text-align: center;
         }
 
         .time-box span {
@@ -106,63 +136,876 @@
             color: var(--accent);
             opacity: 0.7;
             letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* --- PIN SCREEN --- */
+        #pin-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 100;
+            display: none; /* Hidden initially, shown after countdown */
+            opacity: 0;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .bear-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        #pin-screen h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .pin-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pin-subtitle span {
+            display: block;
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 5px;
+            text-transform: none;
+            font-size: 0.9rem;
+        }
+
+        .pin-dots {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--surface-light);
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .keypad button {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            font-weight: 500;
+            height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .keypad button:active {
+            background: var(--surface-light);
+        }
+
+        .keypad .del-btn {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        #error-msg {
+            color: var(--primary);
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            height: 20px;
+        }
+
+        /* --- VOLUME SCREEN --- */
+        #volume-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 90;
+            display: none; 
+            opacity: 0;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            text-align: center;
+        }
+
+        .volume-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse-volume 2s infinite ease-in-out;
+            color: var(--primary);
+        }
+
+        @keyframes pulse-volume {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 10px var(--primary); }
+            50% { transform: scale(1.1); text-shadow: 0 0 25px var(--accent); }
+        }
+
+        /* --- MAIN CONTENT --- */
+        #main-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+            padding: 40px 20px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        section {
+            margin-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .section-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Hero Section */
+        .hero-title {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .hero-name {
+            font-size: 4.5rem;
+            font-weight: 900;
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(90deg, #ff8fa3, #ff4d6d, #c9184a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .hero-year {
+            display: inline-block;
+            background: var(--surface-light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .hero-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 80%;
+        }
+
+        /* Cats Section */
+        .cat-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .cat-box {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 2rem;
+            animation: bounce 2s infinite ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cat-box:nth-child(2) { animation-delay: 0.2s; }
+        .cat-box:nth-child(3) { animation-delay: 0.4s; }
+        .cat-box:nth-child(4) { animation-delay: 0.6s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Camera Section */
+        .camera-btn {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: transform 0.2s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .camera-btn:active {
+            transform: scale(0.9);
+        }
+
+        .photo-count {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .polaroid-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .polaroid {
+            background: #fff;
+            padding: 10px 10px 30px 10px;
+            border-radius: 4px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: none;
+            transform: rotate(-3deg);
+            width: 140px;
+        }
+
+        .polaroid:nth-child(even) {
+            transform: rotate(3deg);
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #ddd;
+            display: block;
+        }
+
+        .polaroid-text {
+            color: #000;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Cake Section */
+        .cake-area {
+            position: relative;
+            width: 200px;
+            height: 150px;
+            margin: 20px auto;
+            cursor: ew-resize;
+            background: var(--surface);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px dashed var(--surface-light);
+        }
+
+        .cake-visual {
+            font-size: 5rem;
+            position: relative;
+            user-select: none;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cake-msg {
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-top: 15px;
+            font-weight: 600;
+            min-height: 20px;
+        }
+
+        /* Spotify Section */
+        .spotify-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* --- Memories Dynamic Center-Pop Slider --- */
+        .slideshow-container {
+            width: 100vw; 
+            flex-shrink: 0; 
+            overflow-x: auto;
+            overflow-y: visible; 
+            scroll-snap-type: x mandatory; 
+            scroll-behavior: smooth;
+            margin-bottom: 20px; 
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .slideshow-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slideshow-track {
+            display: flex;
+            align-items: center;
+            gap: 25px; 
+            padding: 80px calc(50vw - 90px) 110px calc(50vw - 90px); 
+            width: max-content;
+        }
+
+        .memory-card {
+            width: 180px;
+            height: 250px; 
+            border-radius: 16px;
+            flex-shrink: 0;
+            scroll-snap-align: center; 
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            
+            transform: scale(0.8);
+            opacity: 0.4;
+            filter: brightness(0.5);
+        }
+
+        .memory-card.active {
+            transform: scale(1.4); 
+            opacity: 1;
+            filter: brightness(1.1);
+            box-shadow: 0 0 50px rgba(255, 77, 109, 0.8), 0 0 25px rgba(255, 77, 109, 0.6);
+            z-index: 2;
+        }
+
+        .memory-card img {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            object-fit: cover;
+            display: block;
+            pointer-events: none; 
+        }
+
+        /* Buttons (Shared Style) */
+        .action-btn {
+            background: var(--surface-light);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover, .action-btn.wished {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .wish-container {
+            background: var(--surface);
+            padding: 30px 20px;
+            border-radius: 20px;
+            width: 100%;
+            border: 1px solid var(--surface-light);
+        }
+
+        /* Letter Section */
+        .letter-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px 25px;
+            border-radius: 20px;
+            text-align: left;
+            width: 100%;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #ddd;
+            backdrop-filter: blur(10px);
+        }
+
+        .letter-box strong {
+            color: #fff;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="countdown-wrapper">
-        <div class="message">The countdown to your big day!</div>
-        <div class="username">pwetty_kkue</div>
-        <div class="timer">
-            <div class="time-box">
-                <span id="hours">00</span>
-                <div class="label">Hours</div>
+    <audio id="bgMusic" loop>
+        <source src="audio/selfish.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="app-container">
+        
+        <div id="countdown-screen">
+            <div class="message">The countdown to your big day!</div>
+            <div class="username">pwetty_kkue</div>
+            <div class="timer">
+                <div class="time-box">
+                    <span id="hours">00</span>
+                    <div class="label">Hours</div>
+                </div>
+                <div class="time-box">
+                    <span id="minutes">00</span>
+                    <div class="label">Mins</div>
+                </div>
+                <div class="time-box">
+                    <span id="seconds">00</span>
+                    <div class="label">Secs</div>
+                </div>
             </div>
-            <div class="time-box">
-                <span id="minutes">00</span>
-                <div class="label">Mins</div>
-            </div>
-            <div class="time-box">
-                <span id="seconds">00</span>
-                <div class="label">Secs</div>
-            </div>
+            <div class="return-note">Please come back at 00:00! ✨</div>
         </div>
-        <div class="return-note">Please come back at 00:00! ✨</div>
+
+        <div id="pin-screen">
+            <div class="bear-icon">🐻</div>
+            <h2>A surprise is waiting</h2>
+            <div class="pin-subtitle">
+                Enter the secret code
+                <span>Guess the year ......</span>
+            </div>
+            
+            <div class="pin-dots">
+                <div class="dot" id="dot-1"></div>
+                <div class="dot" id="dot-2"></div>
+                <div class="dot" id="dot-3"></div>
+                <div class="dot" id="dot-4"></div>
+            </div>
+
+            <div class="keypad">
+                <button onclick="addPin(1)">1</button>
+                <button onclick="addPin(2)">2</button>
+                <button onclick="addPin(3)">3</button>
+                <button onclick="addPin(4)">4</button>
+                <button onclick="addPin(5)">5</button>
+                <button onclick="addPin(6)">6</button>
+                <button onclick="addPin(7)">7</button>
+                <button onclick="addPin(8)">8</button>
+                <button onclick="addPin(9)">9</button>
+                <button onclick="clearPin()" class="del-btn">DEL</button>
+                <button onclick="addPin(0)">0</button>
+                <button style="visibility: hidden;">.</button>
+            </div>
+            <div id="error-msg">Incorrect Code. Try again!</div>
+        </div>
+
+        <div id="volume-screen">
+            <div class="volume-icon">🔊</div>
+            <h2>Turn it up!</h2>
+            <div class="pin-subtitle" style="margin-bottom: 40px;">
+                For the best experience, please<br>turn your volume up to at least 20%.
+            </div>
+            <button class="action-btn" style="width: auto; padding: 15px 40px; font-size: 1rem;" onclick="enterMainContent()">I'm Ready ✨</button>
+        </div>
+
+        <div id="main-content">
+            
+            <section id="hero">
+                <div class="hero-title">Happy Birthday,</div>
+                <div class="hero-name">Noku</div>
+                <div class="hero-year">✨ 2026 ✨</div>
+                <p class="hero-subtitle">Today is all about celebrating someone truly special ❤️</p>
+            </section>
+
+            <section id="cats">
+                <div class="section-tag">⭐ Your favorite cats</div>
+                <div class="section-title">They're celebrating you!</div>
+                <div class="cat-grid">
+                    <div class="cat-box">🐱</div>
+                    <div class="cat-box">😸</div>
+                    <div class="cat-box">😻</div>
+                    <div class="cat-box">😽</div>
+                </div>
+            </section>
+
+            <section id="camera">
+                <div class="section-tag">📸 Click the camera</div>
+                <div class="section-title">Special moments of you</div>
+                
+                <div class="camera-btn" onclick="revealPhoto()">📷</div>
+                <div class="photo-count" id="photo-count-text">0 / 2 photos</div>
+
+                <div class="polaroid-container">
+                    <div class="polaroid" id="photo-1">
+                        <img src="images/1.jpeg" alt="Noku 1">
+                        <div class="polaroid-text">brighter ✨</div>
+                    </div>
+                    <div class="polaroid" id="photo-2">
+                        <img src="images/10.jpeg" alt="Noku 2">
+                        <div class="polaroid-text">always ❤️</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cake">
+                <div class="section-tag">🍰 Interactive</div>
+                <div class="section-title">Cut the cake!</div>
+                <p class="hero-subtitle" style="font-size: 0.8rem;">Drag or swipe across the box to cut a slice.</p>
+                
+                <div class="cake-area" id="cake-box">
+                    <div class="cake-visual" id="cake-graphic">🎂</div>
+                </div>
+                <div class="cake-msg" id="cake-msg"></div>
+            </section>
+
+            <section id="spotify">
+                <div class="section-tag">🎵 Your favorite song</div>
+                <div class="section-title">Playing just for you</div>
+                <div class="spotify-container">
+                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0RcHujOzndqT6bUQSVhPWs?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+            </section>
+
+            <section id="memories">
+                <div class="section-tag">✨ Memories</div>
+                <div class="section-title">Your beautiful story</div>
+                <p class="hero-subtitle" style="margin-bottom: 20px;">Swipe to explore ❤️</p>
+                
+                <div class="slideshow-container" id="slider">
+                    <div class="slideshow-track">
+                        <div class="memory-card"><img src="images/1.jpeg" alt="Memory 1"></div>
+                        <div class="memory-card"><img src="images/2.jpeg" alt="Memory 2"></div>
+                        <div class="memory-card"><img src="images/3.jpeg" alt="Memory 3"></div>
+                        <div class="memory-card"><img src="images/4.jpeg" alt="Memory 4"></div>
+                        <div class="memory-card"><img src="images/5.jpeg" alt="Memory 5"></div>
+                        <div class="memory-card"><img src="images/6.jpeg" alt="Memory 6"></div>
+                        <div class="memory-card"><img src="images/7.jpeg" alt="Memory 7"></div>
+                        <div class="memory-card"><img src="images/8.jpeg" alt="Memory 8"></div>
+                        <div class="memory-card"><img src="images/9.jpeg" alt="Memory 9"></div>
+                        <div class="memory-card"><img src="images/10.jpeg" alt="Memory 10"></div>
+                        <div class="memory-card"><img src="images/11.jpeg" alt="Memory 11"></div>
+                        <div class="memory-card"><img src="images/12.jpeg" alt="Memory 12"></div>
+                        <div class="memory-card"><img src="images/13.jpeg" alt="Memory 13"></div>
+                        <div class="memory-card"><img src="images/14.jpeg" alt="Memory 14"></div>
+                        <div class="memory-card"><img src="images/15.jpeg" alt="Memory 15"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="wish">
+                <div class="wish-container">
+                    <div class="section-title" style="margin-bottom: 5px;">Make a Birthday Wish</div>
+                    <p class="hero-subtitle" style="margin: 0 auto;">Close your eyes, think of something beautiful, and blow out the candle 🕯️</p>
+                    <button class="action-btn" id="wish-btn" onclick="makeWish()">
+                        <span id="wish-icon">⬜</span> Make my wish!
+                    </button>
+                </div>
+            </section>
+
+            <section id="letter">
+                <div class="section-tag">💌 A special wish</div>
+                <div class="section-title">A letter just for you</div>
+                
+                <div class="letter-box">
+                    <strong>Dearest Noku,</strong>
+                    <br><br>
+                    This is a celebration of how incredible you are. You make everything feel lighter and bring so much joy to the world, even on the darkest days.
+                    <br><br>
+                    On your 18th birthday, take a moment to realize how special you truly are. May this year bring everything you've been wishing for. ❤️
+                    <br><br>
+                    <div style="text-align: right; color: var(--primary);">
+                        <strong>Happy Birthday!</strong><br>
+                        Keep shining ✨
+                    </div>
+                </div>
+            </section>
+
+        </div>
     </div>
 
     <script>
-        // Floating particles
+        // --- Floating Hearts Logic (Used globally) ---
         function createParticle() {
-            const p = document.createElement('div');
-            p.classList.add('floating-particle');
+            const particle = document.createElement('div');
+            particle.classList.add('floating-particle');
+            
             if (Math.random() > 0.5) {
-                p.innerText = '❤';
-                p.style.color = Math.random() > 0.5 ? '#ff4d6d' : '#ff8fa3';
-                p.style.fontSize = Math.random() * 1.5 + 0.5 + 'rem';
+                particle.innerText = '❤';
+                particle.style.color = Math.random() > 0.5 ? 'var(--primary)' : 'var(--accent)';
+                particle.style.textShadow = '0 0 10px rgba(255, 77, 109, 0.6)';
+                particle.style.fontSize = Math.random() * 1.5 + 0.5 + 'rem';
             } else {
-                p.style.width = p.style.height = Math.random() * 8 + 4 + 'px';
-                p.style.backgroundColor = Math.random() > 0.5 ? 'rgba(255,255,255,0.3)' : 'rgba(255,143,163,0.4)';
-                p.style.borderRadius = '50%';
+                const size = Math.random() * 8 + 4 + 'px';
+                particle.style.width = size;
+                particle.style.height = size;
+                particle.style.backgroundColor = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 143, 163, 0.4)';
+                particle.style.borderRadius = '50%';
+                particle.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.2)';
             }
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.animationDuration = Math.random() * 7 + 5 + 's';
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 10000);
-        }
-        setInterval(createParticle, 150);
+            
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDuration = Math.random() * 7 + 5 + 's'; 
+            
+            document.body.appendChild(particle);
 
+            setTimeout(() => {
+                particle.remove();
+            }, parseFloat(particle.style.animationDuration) * 1000);
+        }
+        setInterval(createParticle, 150); // Fast hearts globally
+
+        // --- LAYER 1: Countdown Logic ---
+        let timerInterval;
+        
         function updateTimer() {
             const now = new Date();
+            // Target time: midnight of the next day
             const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
             const diff = tomorrow - now;
+
+            // When countdown reaches 00:00:00 (or goes slightly below)
+            if (diff <= 0) {
+                triggerPinScreen();
+                return;
+            }
 
             document.getElementById("hours").innerText = String(Math.floor(diff / 3600000)).padStart(2, '0');
             document.getElementById("minutes").innerText = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
             document.getElementById("seconds").innerText = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
         }
-        setInterval(updateTimer, 1000);
+        
+        timerInterval = setInterval(updateTimer, 1000);
         updateTimer();
+
+        // Fade from Countdown -> PIN screen
+        function triggerPinScreen() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            document.getElementById('countdown-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('countdown-screen').style.display = 'none';
+                
+                const pinScreen = document.getElementById('pin-screen');
+                pinScreen.style.display = 'flex';
+                void pinScreen.offsetWidth; // trigger reflow
+                pinScreen.style.opacity = '1';
+            }, 800);
+        }
+
+        // --- LAYER 2: PIN Logic ---
+        const SECRET_PIN = "2008"; 
+        let currentPin = "";
+
+        function updateDots() {
+            for(let i=1; i<=4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i <= currentPin.length) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            }
+        }
+
+        function addPin(num) {
+            document.getElementById("error-msg").style.opacity = 0;
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updateDots();
+                
+                if (currentPin.length === 4) {
+                    setTimeout(checkPin, 300);
+                }
+            }
+        }
+
+        function clearPin() {
+            currentPin = currentPin.slice(0, -1);
+            updateDots();
+            document.getElementById("error-msg").style.opacity = 0;
+        }
+
+        function checkPin() {
+            if (currentPin === SECRET_PIN) {
+                // Pin is correct! Fade to Layer 2.5 (Volume Screen)
+                document.getElementById('pin-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('pin-screen').style.display = 'none';
+                    
+                    const volumeScreen = document.getElementById('volume-screen');
+                    volumeScreen.style.display = 'flex';
+                    void volumeScreen.offsetWidth; // trigger reflow
+                    volumeScreen.style.opacity = '1';
+                }, 800);
+            } else {
+                document.getElementById("error-msg").style.opacity = 1;
+                currentPin = "";
+                updateDots();
+            }
+        }
+
+        // --- LAYER 2.5: Volume & Audio Trigger ---
+        function enterMainContent() {
+            // Play the Nasty C song NOW since the user has explicitly clicked a button
+            let bgMusic = document.getElementById('bgMusic');
+            if (bgMusic) {
+                bgMusic.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            // Fade to Main Content
+            document.getElementById('volume-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('volume-screen').style.display = 'none';
+                
+                const mainContent = document.getElementById('main-content');
+                mainContent.style.display = 'block';
+                void mainContent.offsetWidth; // trigger reflow
+                mainContent.style.opacity = '1';
+                
+                // Trigger carousel center calculation once the layout is visible
+                setTimeout(updateActiveCard, 100); 
+            }, 800);
+        }
+
+        // --- LAYER 3: Main Content Interactions ---
+
+        // Center-Pop Carousel Logic
+        const slider = document.getElementById('slider');
+        const cards = document.querySelectorAll('.memory-card');
+
+        function updateActiveCard() {
+            const centerPoint = window.innerWidth / 2;
+            let closestCard = null;
+            let minDistance = Infinity;
+
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.left + (rect.width / 2);
+                const distance = Math.abs(centerPoint - cardCenter);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestCard = card;
+                }
+            });
+
+            cards.forEach(card => {
+                if (card === closestCard) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+        }
+
+        slider.addEventListener('scroll', updateActiveCard);
+        window.addEventListener('resize', updateActiveCard);
+
+        // Camera Logic
+        let photosRevealed = 0;
+        function revealPhoto() {
+            if (photosRevealed === 0) {
+                document.getElementById('photo-1').style.display = 'block';
+                photosRevealed++;
+                document.getElementById('photo-count-text').innerText = "1 / 2 photos";
+            } else if (photosRevealed === 1) {
+                document.getElementById('photo-2').style.display = 'block';
+                photosRevealed++;
+                document.getElementById('photo-count-text').innerText = "✨ ALL PHOTOS REVEALED ✨";
+                document.getElementById('photo-count-text').style.color = "#ff8fa3";
+            }
+        }
+
+        // Interactive Cake Logic
+        const cakeBox = document.getElementById('cake-box');
+        const cakeGraphic = document.getElementById('cake-graphic');
+        const cakeMsg = document.getElementById('cake-msg');
+        let isDragging = false;
+        let startX = 0;
+
+        cakeBox.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+        });
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            if (e.clientX - startX > 50) cutCake();
+        });
+
+        cakeBox.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+        });
+        window.addEventListener('touchend', () => isDragging = false);
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            if (e.touches[0].clientX - startX > 50) cutCake();
+        });
+
+        let cakeCut = false;
+        function cutCake() {
+            if(cakeCut) return;
+            cakeCut = true;
+            isDragging = false;
+            cakeGraphic.innerHTML = "🍰   🍰";
+            cakeGraphic.style.transform = "scale(1.1)";
+            cakeMsg.innerHTML = "✨ Perfect slice! Here's your piece! ✨";
+        }
+
+        // Wish Logic
+        let wished = false;
+        function makeWish() {
+            if(wished) return;
+            wished = true;
+            const btn = document.getElementById('wish-btn');
+            const icon = document.getElementById('wish-icon');
+            
+            btn.classList.add('wished');
+            icon.innerText = "✅";
+            btn.innerHTML = `<span id="wish-icon">✅</span> Wish Made!`;
+        }
     </script>
 </body>
 </html>
