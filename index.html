@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counting Down...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --primary: #ff4d6d;
+            --text-main: #ffffff;
+            --accent: #ff8fa3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Same Floating Particles Logic */
+        .floating-particle {
+            position: fixed;
+            bottom: -10vh;
+            z-index: 1;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Countdown Container */
+        .countdown-wrapper {
+            z-index: 10;
+            text-align: center;
+        }
+
+        .timer {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .time-box {
+            background: #141419;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100px;
+            border: 1px solid #23232b;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="countdown-wrapper">
+        <div class="timer">
+            <div class="time-box">
+                <span id="hours">00</span>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-box">
+                <span id="minutes">00</span>
+                <div class="label">Mins</div>
+            </div>
+            <div class="time-box">
+                <span id="seconds">00</span>
+                <div class="label">Secs</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Floating particles
+        function createParticle() {
+            const p = document.createElement('div');
+            p.classList.add('floating-particle');
+            if (Math.random() > 0.5) {
+                p.innerText = '❤';
+                p.style.color = Math.random() > 0.5 ? '#ff4d6d' : '#ff8fa3';
+                p.style.fontSize = Math.random() * 1.5 + 0.5 + 'rem';
+            } else {
+                p.style.width = p.style.height = Math.random() * 8 + 4 + 'px';
+                p.style.backgroundColor = Math.random() > 0.5 ? 'rgba(255,255,255,0.3)' : 'rgba(255,143,163,0.4)';
+                p.style.borderRadius = '50%';
+            }
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = Math.random() * 7 + 5 + 's';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 10000);
+        }
+        setInterval(createParticle, 400);
+
+        // Countdown Logic (Target: Midnight)
+        function updateTimer() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            const diff = tomorrow - now;
+
+            document.getElementById("hours").innerText = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+</body>
+</html>
