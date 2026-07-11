@@ -60,85 +60,6 @@
             z-index: 10;
         }
 
-        /* --- COUNTDOWN SCREEN --- */
-        #countdown-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        .message {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.8;
-            text-align: center;
-        }
-
-        .username {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 40px;
-            text-shadow: 0 0 10px var(--primary), 0 0 20px rgba(255, 77, 109, 0.5);
-            animation: heartbeat 1.5s ease-in-out infinite;
-            text-align: center;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); text-shadow: 0 0 10px var(--primary); }
-            50% { transform: scale(1.05); text-shadow: 0 0 20px var(--primary), 0 0 30px var(--accent); }
-        }
-
-        .timer {
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .time-box {
-            background: transparent;
-            padding: 20px;
-            width: 100px;
-            text-align: center;
-        }
-
-        .time-box span {
-            display: block;
-            font-size: 4rem;
-            font-weight: 900;
-            color: var(--primary);
-            text-shadow: 0 0 20px rgba(255, 77, 109, 0.8), 0 0 40px rgba(255, 77, 109, 0.4);
-        }
-
-        .label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #888;
-            margin-top: 10px;
-            letter-spacing: 2px;
-        }
-
-        .return-note {
-            font-size: 0.9rem;
-            color: var(--accent);
-            opacity: 0.7;
-            letter-spacing: 1px;
-            text-align: center;
-        }
-
         /* --- PIN SCREEN --- */
         #pin-screen {
             position: fixed;
@@ -148,8 +69,7 @@
             height: 100%;
             background: var(--bg-color);
             z-index: 100;
-            display: none; /* Hidden initially, shown after countdown */
-            opacity: 0;
+            display: flex; /* Shown immediately */
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -588,26 +508,6 @@
 
     <div class="app-container">
         
-        <div id="countdown-screen">
-            <div class="message">The countdown to your big day!</div>
-            <div class="username">pwetty_kkue</div>
-            <div class="timer">
-                <div class="time-box">
-                    <span id="hours">00</span>
-                    <div class="label">Hours</div>
-                </div>
-                <div class="time-box">
-                    <span id="minutes">00</span>
-                    <div class="label">Mins</div>
-                </div>
-                <div class="time-box">
-                    <span id="seconds">00</span>
-                    <div class="label">Secs</div>
-                </div>
-            </div>
-            <div class="return-note">Please come back at 00:00! ✨</div>
-        </div>
-
         <div id="pin-screen">
             <div class="bear-icon">🐻</div>
             <h2>A surprise is waiting</h2>
@@ -795,45 +695,7 @@
         }
         setInterval(createParticle, 150); // Fast hearts globally
 
-        // --- LAYER 1: Countdown Logic ---
-        let timerInterval;
-        
-        function updateTimer() {
-            const now = new Date();
-            // Target time: midnight of the next day
-            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-            const diff = tomorrow - now;
-
-            // When countdown reaches 00:00:00 (or goes slightly below)
-            if (diff <= 0) {
-                triggerPinScreen();
-                return;
-            }
-
-            document.getElementById("hours").innerText = String(Math.floor(diff / 3600000)).padStart(2, '0');
-            document.getElementById("minutes").innerText = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-            document.getElementById("seconds").innerText = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-        }
-        
-        timerInterval = setInterval(updateTimer, 1000);
-        updateTimer();
-
-        // Fade from Countdown -> PIN screen
-        function triggerPinScreen() {
-            if (timerInterval) clearInterval(timerInterval);
-            
-            document.getElementById('countdown-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('countdown-screen').style.display = 'none';
-                
-                const pinScreen = document.getElementById('pin-screen');
-                pinScreen.style.display = 'flex';
-                void pinScreen.offsetWidth; // trigger reflow
-                pinScreen.style.opacity = '1';
-            }, 800);
-        }
-
-        // --- LAYER 2: PIN Logic ---
+        // --- PIN Logic ---
         const SECRET_PIN = "2008"; 
         let currentPin = "";
 
@@ -868,7 +730,7 @@
 
         function checkPin() {
             if (currentPin === SECRET_PIN) {
-                // Pin is correct! Fade to Layer 2.5 (Volume Screen)
+                // Pin is correct! Fade to Volume Screen
                 document.getElementById('pin-screen').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('pin-screen').style.display = 'none';
@@ -885,7 +747,7 @@
             }
         }
 
-        // --- LAYER 2.5: Volume & Audio Trigger ---
+        // --- Volume & Audio Trigger ---
         function enterMainContent() {
             // Play the Nasty C song NOW since the user has explicitly clicked a button
             let bgMusic = document.getElementById('bgMusic');
@@ -908,7 +770,7 @@
             }, 800);
         }
 
-        // --- LAYER 3: Main Content Interactions ---
+        // --- Main Content Interactions ---
 
         // Center-Pop Carousel Logic
         const slider = document.getElementById('slider');
